@@ -1,0 +1,175 @@
+@page "{id:int}"
+@model SecurityStore.Web.Pages.Products.DetailsModel
+@{
+    ViewData["Title"] = Model.Product.Name;
+}
+
+<div class="row">
+    <div class="col-md-6">
+        @if (Model.Product.MainImage != null)
+        {
+            <img src="@Model.Product.MainImage" class="img-fluid rounded" alt="@Model.Product.Name">
+        }
+        else
+        {
+            <div class="bg-light d-flex align-items-center justify-content-center rounded" style="height: 400px;">
+                <i class="bi bi-image display-1 text-muted"></i>
+            </div>
+        }
+        
+        @if (Model.Product.ProductImages.Any())
+        {
+            <div class="row mt-3 g-2">
+                @foreach (var image in Model.Product.ProductImages)
+                {
+                    <div class="col-3">
+                        <img src="@image.ImageUrl" class="img-thumbnail" alt="@image.AltText">
+                    </div>
+                }
+            </div>
+        }
+    </div>
+    
+    <div class="col-md-6">
+        <h1>@Model.Product.Name</h1>
+        
+        @if (Model.Product.Brand != null)
+        {
+            <p class="text-muted"><i class="bi bi-tag"></i> برند: @Model.Product.Brand</p>
+        }
+        
+        <p class="text-muted"><i class="bi bi-grid"></i> دسته‌بندی: @Model.Product.Category.Name</p>
+        
+        <hr>
+        
+        <div class="mb-3">
+            <h3>
+                @if (Model.Product.DiscountPrice.HasValue)
+                {
+                    <span class="text-decoration-line-through text-muted">@Model.Product.Price.ToString("N0")</span>
+                    <span class="text-danger">@Model.Product.DiscountPrice.Value.ToString("N0")</span>
+                    <span>تومان</span>
+                    <span class="badge bg-danger">
+                        تخفیف @(((Model.Product.Price - Model.Product.DiscountPrice.Value) / Model.Product.Price * 100).ToString("0"))%
+                    </span>
+                }
+                else
+                {
+                    <span>@Model.Product.Price.ToString("N0") تومان</span>
+                }
+            </h3>
+        </div>
+        
+        @if (Model.Product.StockQuantity > 0)
+        {
+            <div class="alert alert-success">
+                <i class="bi bi-check-circle"></i> موجود (@Model.Product.StockQuantity عدد)
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-danger">
+                <i class="bi bi-x-circle"></i> ناموجود
+            </div>
+        }
+        
+        @if (Model.Product.ShortDescription != null)
+        {
+            <p class="lead">@Model.Product.ShortDescription</p>
+        }
+        
+        @if (Model.Product.ProductVariants.Any())
+        {
+            <div class="mb-3">
+                <h5>انتخاب نوع:</h5>
+                <div class="list-group">
+                    @foreach (var variant in Model.Product.ProductVariants)
+                    {
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>@variant.AttributeName:</strong> @variant.AttributeValue
+                                    @if (variant.PriceAdjustment.HasValue)
+                                    {
+                                        <span class="text-muted">(+@variant.PriceAdjustment.Value.ToString("N0") تومان)</span>
+                                    }
+                                </div>
+                                <span class="badge @(variant.StockQuantity > 0 ? "bg-success" : "bg-danger")">
+                                    @(variant.StockQuantity > 0 ? $"موجود ({variant.StockQuantity})" : "ناموجود")
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        
+        @if (Model.Product.StockQuantity > 0)
+        {
+            <form method="post" class="mb-3">
+                <div class="input-group">
+                    <input type="number" name="quantity" value="1" min="1" max="@Model.Product.StockQuantity" class="form-control" style="max-width: 100px;">
+                    <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+                        <i class="bi bi-cart-plus"></i> افزودن به سبد خرید
+                    </button>
+                </div>
+            </form>
+        }
+        
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary">
+                <i class="bi bi-heart"></i> علاقه‌مندی‌ها
+            </button>
+            <button class="btn btn-outline-secondary">
+                <i class="bi bi-share"></i> اشتراک‌گذاری
+            </button>
+        </div>
+    </div>
+</div>
+
+@if (Model.Product.LongDescription != null)
+{
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="bi bi-info-circle"></i> توضیحات کامل</h4>
+                </div>
+                <div class="card-body">
+                    @Html.Raw(Model.Product.LongDescription)
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row mt-5">
+    <div class="col-md-12">
+        <h4><i class="bi bi-box"></i> محصولات مرتبط</h4>
+        <hr>
+        
+        @if (Model.RelatedProducts.Any())
+        {
+            <div class="row g-3">
+                @foreach (var product in Model.RelatedProducts)
+                {
+                    <div class="col-md-3">
+                        <div class="card h-100">
+                            @if (product.MainImage != null)
+                            {
+                                <img src="@product.MainImage" class="card-img-top" alt="@product.Name" style="height: 150px; object-fit: cover;">
+                            }
+                            <div class="card-body">
+                                <h6 class="card-title">@product.Name</h6>
+                                <p class="h6">@product.Price.ToString("N0") تومان</p>
+                                <a asp-page="/Products/Details" asp-route-id="@product.Id" class="btn btn-sm btn-outline-primary w-100">
+                                    مشاهده
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

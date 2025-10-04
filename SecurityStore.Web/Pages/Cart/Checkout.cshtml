@@ -1,0 +1,121 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@model SecurityStore.Web.Pages.Cart.CheckoutModel
+@{
+    ViewData["Title"] = "تسویه حساب";
+}
+
+<h2><i class="bi bi-check-circle"></i> تسویه حساب</h2>
+<hr>
+
+<form method="post">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5><i class="bi bi-truck"></i> اطلاعات ارسال</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label asp-for="Input.ShippingAddress" class="form-label"></label>
+                            <textarea asp-for="Input.ShippingAddress" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Input.ShippingAddress" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Input.ShippingCity" class="form-label"></label>
+                            <input asp-for="Input.ShippingCity" class="form-control" />
+                            <span asp-validation-for="Input.ShippingCity" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Input.ShippingPostalCode" class="form-label"></label>
+                            <input asp-for="Input.ShippingPostalCode" class="form-control" />
+                            <span asp-validation-for="Input.ShippingPostalCode" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-12 mb-3">
+                            <label asp-for="Input.ShippingPhone" class="form-label"></label>
+                            <input asp-for="Input.ShippingPhone" class="form-control" />
+                            <span asp-validation-for="Input.ShippingPhone" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <label asp-for="Input.Notes" class="form-label"></label>
+                            <textarea asp-for="Input.Notes" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-credit-card"></i> روش پرداخت</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" value="online" checked>
+                        <label class="form-check-label">
+                            پرداخت آنلاین (درگاه پرداخت)
+                        </label>
+                    </div>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="radio" name="paymentMethod" value="cash">
+                        <label class="form-check-label">
+                            پرداخت در محل (هنگام دریافت)
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-receipt"></i> خلاصه سفارش</h5>
+                </div>
+                <div class="card-body">
+                    <h6>محصولات:</h6>
+                    <ul class="list-unstyled">
+                        @foreach (var item in Model.CartItems)
+                        {
+                            <li class="mb-2">
+                                <small>@item.ProductName x @item.Quantity</small>
+                                <br>
+                                <small class="text-muted">@((item.Price * item.Quantity).ToString("N0")) تومان</small>
+                            </li>
+                        }
+                    </ul>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>جمع کل:</span>
+                        <strong>@Model.SubTotal.ToString("N0") تومان</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>هزینه ارسال:</span>
+                        <strong>@Model.ShippingCost.ToString("N0") تومان</strong>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="h5">مجموع نهایی:</span>
+                        <strong class="h5 text-primary">@Model.Total.ToString("N0") تومان</strong>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success btn-lg w-100">
+                        <i class="bi bi-check-circle"></i> تکمیل سفارش
+                    </button>
+                    
+                    <a asp-page="/Cart/Index" class="btn btn-outline-secondary w-100 mt-2">
+                        <i class="bi bi-arrow-right"></i> بازگشت به سبد خرید
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
