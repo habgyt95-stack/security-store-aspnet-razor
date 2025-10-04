@@ -143,6 +143,124 @@
     </div>
 }
 
+<!-- Reviews Section -->
+<div class="row mt-5">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h4>
+                    <i class="bi bi-star-fill text-warning"></i> نظرات و امتیازات
+                    @if (Model.AverageRating > 0)
+                    {
+                        <span class="badge bg-warning text-dark">@Model.AverageRating.ToString("0.0")</span>
+                        <small class="text-muted">(@Model.TotalReviews نظر)</small>
+                    }
+                </h4>
+            </div>
+            <div class="card-body">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    @if (Model.UserCanReview)
+                    {
+                        <div class="alert alert-info">
+                            <h5><i class="bi bi-pencil-square"></i> نظر خود را درباره این محصول بنویسید</h5>
+                            <form method="post" asp-page-handler="SubmitReview">
+                                <div class="mb-3">
+                                    <label class="form-label">امتیاز شما</label>
+                                    <div class="rating-input">
+                                        @for (int i = 5; i >= 1; i--)
+                                        {
+                                            <input type="radio" name="Rating" value="@i" id="star@(i)" required />
+                                            <label for="star@(i)"><i class="bi bi-star-fill"></i></label>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">عنوان نظر</label>
+                                    <input type="text" name="Title" class="form-control" maxlength="100" />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">متن نظر</label>
+                                    <textarea name="Comment" class="form-control" rows="3" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-send"></i> ارسال نظر
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else if (!Model.UserHasPurchased)
+                    {
+                        <div class="alert alert-warning">
+                            <i class="bi bi-info-circle"></i> برای ثبت نظر، ابتدا باید این محصول را خریداری کرده باشید.
+                        </div>
+                    }
+                    else if (Model.UserHasReviewed)
+                    {
+                        <div class="alert alert-info">
+                            <i class="bi bi-check-circle"></i> شما قبلاً نظر خود را درباره این محصول ثبت کرده‌اید.
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        برای ثبت نظر، لطفاً <a asp-page="/Account/Login">وارد شوید</a>
+                    </div>
+                }
+
+                <hr>
+
+                @if (Model.ApprovedReviews.Any())
+                {
+                    <h5 class="mb-3">نظرات کاربران</h5>
+                    @foreach (var review in Model.ApprovedReviews)
+                    {
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="mb-2">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <i class="bi bi-star-fill @(i <= review.Rating ? "text-warning" : "text-muted")"></i>
+                                            }
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(review.Title))
+                                        {
+                                            <h6>@review.Title</h6>
+                                        }
+                                        <p class="mb-2">@review.Comment</p>
+                                        <small class="text-muted">
+                                            <i class="bi bi-person"></i> 
+                                            @if (review.ShowUserName)
+                                            {
+                                                @review.UserName
+                                            }
+                                            else
+                                            {
+                                                <text>کاربر ناشناس</text>
+                                            }
+                                            · @review.CreatedAt.ToString("yyyy/MM/dd")
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center text-muted py-3">
+                        <i class="bi bi-chat-dots" style="font-size: 2rem;"></i>
+                        <p class="mt-2">هنوز نظری ثبت نشده است. اولین نفری باشید که نظر می‌دهید!</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row mt-5">
     <div class="col-md-12">
         <h4><i class="bi bi-box"></i> محصولات مرتبط</h4>

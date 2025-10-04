@@ -51,8 +51,7 @@
                                     <i class="bi bi-person-circle"></i> @User.Identity?.Name
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" asp-page="/Account/Profile"><i class="bi bi-person"></i> پروفایل</a></li>
-                                    <li><a class="dropdown-item" asp-page="/Account/Orders"><i class="bi bi-bag"></i> سفارشات</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Profile/MyOrders"><i class="bi bi-bag-check"></i> سفارشات من</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form method="post" asp-page="/Account/Logout" class="d-inline">
