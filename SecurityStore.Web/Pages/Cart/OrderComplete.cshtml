@@ -1,0 +1,134 @@
+@page "{id:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@model SecurityStore.Web.Pages.Cart.OrderCompleteModel
+@{
+    ViewData["Title"] = "سفارش با موفقیت ثبت شد";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    
+                    <h2 class="mb-3">سفارش شما با موفقیت ثبت شد!</h2>
+                    <p class="text-muted mb-4">از خرید شما متشکریم</p>
+                    
+                    <div class="alert alert-info">
+                        <h5><i class="bi bi-receipt"></i> شماره سفارش: <strong>@Model.Order.OrderNumber</strong></h5>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row text-end mt-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="bi bi-truck"></i> اطلاعات ارسال</h6>
+                                    <hr>
+                                    <p class="mb-1"><strong>آدرس:</strong> @Model.Order.ShippingAddress</p>
+                                    <p class="mb-1"><strong>شهر:</strong> @Model.Order.ShippingCity</p>
+                                    <p class="mb-1"><strong>کد پستی:</strong> @Model.Order.ShippingPostalCode</p>
+                                    <p class="mb-0"><strong>تلفن:</strong> @Model.Order.ShippingPhone</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="bi bi-info-circle"></i> جزئیات سفارش</h6>
+                                    <hr>
+                                    <p class="mb-1"><strong>تاریخ:</strong> @Model.Order.CreatedAt.ToString("yyyy/MM/dd - HH:mm")</p>
+                                    <p class="mb-1"><strong>وضعیت:</strong> <span class="badge bg-warning">@Model.GetStatusText()</span></p>
+                                    <p class="mb-1"><strong>تعداد اقلام:</strong> @Model.Order.OrderItems.Count</p>
+                                    @if (Model.Order.TransactionId != null)
+                                    {
+                                        <p class="mb-0"><strong>شناسه تراکنش:</strong> @Model.Order.TransactionId</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h6><i class="bi bi-cart"></i> اقلام سفارش</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover text-end">
+                                    <thead>
+                                        <tr>
+                                            <th>محصول</th>
+                                            <th>تعداد</th>
+                                            <th>قیمت واحد</th>
+                                            <th>جمع</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.Order.OrderItems)
+                                        {
+                                            <tr>
+                                                <td>@item.ProductName</td>
+                                                <td>@item.Quantity</td>
+                                                <td>@item.UnitPrice.ToString("N0") تومان</td>
+                                                <td>@((item.Quantity * item.UnitPrice).ToString("N0")) تومان</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3" class="text-start"><strong>جمع کل:</strong></td>
+                                            <td><strong>@Model.Order.SubTotal.ToString("N0") تومان</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-start"><strong>هزینه ارسال:</strong></td>
+                                            <td><strong>@Model.Order.ShippingCost.ToString("N0") تومان</strong></td>
+                                        </tr>
+                                        @if (Model.Order.Discount > 0)
+                                        {
+                                            <tr>
+                                                <td colspan="3" class="text-start text-success"><strong>تخفیف:</strong></td>
+                                                <td class="text-success"><strong>-@Model.Order.Discount.ToString("N0") تومان</strong></td>
+                                            </tr>
+                                        }
+                                        <tr class="table-active">
+                                            <td colspan="3" class="text-start"><strong>مبلغ نهایی:</strong></td>
+                                            <td><strong class="text-primary">@Model.Order.TotalAmount.ToString("N0") تومان</strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(Model.Order.Notes))
+                    {
+                        <div class="alert alert-secondary text-end mt-3">
+                            <strong><i class="bi bi-chat-left-text"></i> یادداشت:</strong> @Model.Order.Notes
+                        </div>
+                    }
+                    
+                    <div class="mt-4 d-flex gap-2 justify-content-center">
+                        <a href="/" class="btn btn-primary">
+                            <i class="bi bi-house"></i> بازگشت به صفحه اصلی
+                        </a>
+                        <a href="/Products" class="btn btn-outline-primary">
+                            <i class="bi bi-shop"></i> ادامه خرید
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mt-4 text-end">
+                <i class="bi bi-info-circle"></i> 
+                <strong>توجه:</strong> پیامکی حاوی اطلاعات سفارش به شماره تماس شما ارسال خواهد شد.
+            </div>
+        </div>
+    </div>
+</div>

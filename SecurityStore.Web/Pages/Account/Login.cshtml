@@ -25,9 +25,16 @@
                         <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
                     
-                    <div class="mb-3 form-check">
-                        <input asp-for="Input.RememberMe" class="form-check-input" />
-                        <label asp-for="Input.RememberMe" class="form-check-label"></label>
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div class="form-check">
+                            <input asp-for="Input.RememberMe" class="form-check-input" />
+                            <label asp-for="Input.RememberMe" class="form-check-label"></label>
+                        </div>
+                        <div>
+                            <a asp-page="/Account/ForgotPassword" class="text-decoration-none">
+                                <i class="bi bi-question-circle"></i> رمز عبور را فراموش کرده‌اید؟
+                            </a>
+                        </div>
                     </div>
                     
                     <div class="d-grid">
