@@ -1,0 +1,149 @@
+@page
+@model SecurityStore.Web.Pages.Cart.IndexModel
+@{
+    ViewData["Title"] = "سبد خرید";
+}
+
+<h2><i class="bi bi-cart"></i> سبد خرید</h2>
+<hr>
+
+@if (Model.CartItems.Any())
+{
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>محصول</th>
+                                <th>قیمت واحد</th>
+                                <th>تعداد</th>
+                                <th>قیمت کل</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.CartItems)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            @if (item.ImageUrl != null)
+                                            {
+                                                <img src="@item.ImageUrl" alt="@item.ProductName" style="width: 60px; height: 60px; object-fit: cover;" class="me-3 rounded">
+                                            }
+                                            <div>
+                                                <strong>@item.ProductName</strong>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@item.Price.ToString("N0") تومان</td>
+                                    <td>
+                                        <form method="post" asp-page-handler="UpdateQuantity" class="d-inline">
+                                            <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <div class="input-group" style="width: 120px;">
+                                                <button type="submit" name="action" value="decrease" class="btn btn-outline-secondary btn-sm">-</button>
+                                                <input type="text" class="form-control form-control-sm text-center" value="@item.Quantity" readonly>
+                                                <button type="submit" name="action" value="increase" class="btn btn-outline-secondary btn-sm">+</button>
+                                            </div>
+                                        </form>
+                                    </td>
+                                    <td><strong>@((item.Price * item.Quantity).ToString("N0")) تومان</strong></td>
+                                    <td>
+                                        <form method="post" asp-page-handler="Remove" class="d-inline">
+                                            <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <a asp-page="/Products/Index" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-right"></i> ادامه خرید
+                </a>
+                <form method="post" asp-page-handler="Clear" class="d-inline">
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="bi bi-x-circle"></i> پاک کردن سبد خرید
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-calculator"></i> خلاصه سفارش</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>جمع کل محصولات:</span>
+                        <strong>@Model.SubTotal.ToString("N0") تومان</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>هزینه ارسال:</span>
+                        <strong>@Model.ShippingCost.ToString("N0") تومان</strong>
+                    </div>
+                    @if (Model.Discount > 0)
+                    {
+                        <div class="d-flex justify-content-between mb-2 text-success">
+                            <span>تخفیف:</span>
+                            <strong>@Model.Discount.ToString("N0") تومان-</strong>
+                        </div>
+                    }
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="h5">مجموع:</span>
+                        <strong class="h5 text-primary">@Model.Total.ToString("N0") تومان</strong>
+                    </div>
+                    
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a asp-page="/Cart/Checkout" class="btn btn-success btn-lg w-100">
+                            <i class="bi bi-check-circle"></i> تسویه حساب
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-page="/Account/Login" asp-route-returnUrl="/Cart/Checkout" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-box-arrow-in-right"></i> ورود برای ادامه
+                        </a>
+                    }
+                </div>
+            </div>
+            
+            @if (Model.SubTotal < 5000000)
+            {
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle"></i> 
+                    با خرید @((5000000 - Model.SubTotal).ToString("N0")) تومان دیگر، ارسال رایگان!
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-success mt-3">
+                    <i class="bi bi-check-circle"></i> 
+                    شما از ارسال رایگان برخوردار هستید!
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="text-center py-5">
+        <i class="bi bi-cart-x display-1 text-muted"></i>
+        <h3 class="mt-3">سبد خرید شما خالی است</h3>
+        <p class="text-muted">برای افزودن محصول به سبد خرید، به صفحه محصولات بروید</p>
+        <a asp-page="/Products/Index" class="btn btn-primary btn-lg mt-3">
+            <i class="bi bi-box"></i> مشاهده محصولات
+        </a>
+    </div>
+}

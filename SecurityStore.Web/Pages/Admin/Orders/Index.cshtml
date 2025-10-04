@@ -1,0 +1,145 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin,Manager")]
+@model SecurityStore.Web.Pages.Admin.Orders.IndexModel
+@{
+    ViewData["Title"] = "مدیریت سفارشات";
+}
+
+<h2><i class="bi bi-bag"></i> مدیریت سفارشات</h2>
+<hr>
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="searchTerm" class="form-control" placeholder="جستجو با شماره سفارش..." value="@Model.SearchTerm">
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">همه وضعیت‌ها</option>
+                    <option value="0" selected="@(Model.Status == 0)">در انتظار پرداخت</option>
+                    <option value="1" selected="@(Model.Status == 1)">پرداخت شده</option>
+                    <option value="2" selected="@(Model.Status == 2)">در حال پردازش</option>
+                    <option value="3" selected="@(Model.Status == 3)">ارسال شده</option>
+                    <option value="4" selected="@(Model.Status == 4)">تحویل داده شده</option>
+                    <option value="5" selected="@(Model.Status == 5)">لغو شده</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> جستجو</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Orders.Any())
+{
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>شماره سفارش</th>
+                            <th>مشتری</th>
+                            <th>تاریخ</th>
+                            <th>مبلغ (تومان)</th>
+                            <th>وضعیت</th>
+                            <th>روش پرداخت</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model.Orders)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@order.OrderNumber</strong>
+                                </td>
+                                <td>@order.UserId</td>
+                                <td>@order.CreatedAt.ToString("yyyy/MM/dd HH:mm")</td>
+                                <td>@order.TotalAmount.ToString("N0")</td>
+                                <td>
+                                    <span class="badge bg-@GetStatusClass(order.Status)">
+                                        @GetStatusText(order.Status)
+                                    </span>
+                                </td>
+                                <td>@order.PaymentMethod</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-page="/Admin/Orders/Details" asp-route-id="@order.Id" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> جزئیات
+                                        </a>
+                                        @if (order.Status == Domain.Enums.OrderStatus.Paid)
+                                        {
+                                            <form method="post" asp-page-handler="UpdateStatus" asp-route-id="@order.Id" asp-route-status="2" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-success">
+                                                    <i class="bi bi-check"></i> پردازش
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Page navigation" class="mt-3">
+            <ul class="pagination justify-content-center">
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" asp-page="/Admin/Orders/Index" 
+                           asp-route-page="@i"
+                           asp-route-searchTerm="@Model.SearchTerm"
+                           asp-route-status="@Model.Status">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> هیچ سفارشی یافت نشد.
+    </div>
+}
+
+@functions {
+    string GetStatusClass(SecurityStore.Domain.Enums.OrderStatus status)
+    {
+        return status switch
+        {
+            SecurityStore.Domain.Enums.OrderStatus.Pending => "warning",
+            SecurityStore.Domain.Enums.OrderStatus.Paid => "success",
+            SecurityStore.Domain.Enums.OrderStatus.Processing => "info",
+            SecurityStore.Domain.Enums.OrderStatus.Shipped => "primary",
+            SecurityStore.Domain.Enums.OrderStatus.Delivered => "success",
+            SecurityStore.Domain.Enums.OrderStatus.Cancelled => "danger",
+            _ => "secondary"
+        };
+    }
+    
+    string GetStatusText(SecurityStore.Domain.Enums.OrderStatus status)
+    {
+        return status switch
+        {
+            SecurityStore.Domain.Enums.OrderStatus.Pending => "در انتظار پرداخت",
+            SecurityStore.Domain.Enums.OrderStatus.Paid => "پرداخت شده",
+            SecurityStore.Domain.Enums.OrderStatus.Processing => "در حال پردازش",
+            SecurityStore.Domain.Enums.OrderStatus.Shipped => "ارسال شده",
+            SecurityStore.Domain.Enums.OrderStatus.Delivered => "تحویل داده شده",
+            SecurityStore.Domain.Enums.OrderStatus.Cancelled => "لغو شده",
+            _ => "نامشخص"
+        };
+    }
+}

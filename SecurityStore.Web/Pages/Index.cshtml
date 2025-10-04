@@ -1,0 +1,104 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "خانه";
+}
+
+<!-- Hero Section - بخش اصلی -->
+<div class="bg-primary text-white rounded p-5 mb-4">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold">فروشگاه امنیتی</h1>
+            <p class="lead">تجهیزات امنیتی با کیفیت برای حفاظت از خانه و کسب‌وکار شما</p>
+            <a asp-page="/Products/Index" class="btn btn-light btn-lg">
+                <i class="bi bi-box"></i> مشاهده محصولات
+            </a>
+        </div>
+        <div class="col-lg-6 text-center">
+            <i class="bi bi-camera-video display-1"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Products - محصولات ویژه -->
+<div class="mb-5">
+    <h2 class="mb-4"><i class="bi bi-star"></i> محصولات ویژه</h2>
+    @if (Model.FeaturedProducts.Any())
+    {
+        <div class="row g-4">
+            @foreach (var product in Model.FeaturedProducts)
+            {
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@product.Name</h5>
+                            <p class="card-text">@product.ShortDescription</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    @if (product.DiscountPrice.HasValue)
+                                    {
+                                        <span class="text-decoration-line-through text-muted">@product.Price.ToString("N0") تومان</span>
+                                        <br>
+                                        <span class="h5 text-danger">@product.DiscountPrice.Value.ToString("N0") تومان</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="h5">@product.Price.ToString("N0") تومان</span>
+                                    }
+                                </div>
+                                <a asp-page="/Products/Details" asp-route-id="@product.Id" class="btn btn-primary">
+                                    <i class="bi bi-eye"></i> مشاهده
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Categories - دسته‌بندی‌ها -->
+<div class="mb-5">
+    <h2 class="mb-4"><i class="bi bi-grid"></i> دسته‌بندی محصولات</h2>
+    <div class="row g-3">
+        @foreach (var category in Model.Categories)
+        {
+            <div class="col-md-4">
+                <a asp-page="/Products/Index" asp-route-category="@category.Slug" class="text-decoration-none">
+                    <div class="card shadow-sm hover-shadow">
+                        <div class="card-body text-center">
+                            <i class="@category.Icon display-4 text-primary"></i>
+                            <h5 class="mt-3">@category.Name</h5>
+                            <p class="text-muted">@category.Description</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Features - ویژگی‌ها -->
+<div class="row text-center mb-5">
+    <div class="col-md-3">
+        <i class="bi bi-truck display-4 text-primary"></i>
+        <h5 class="mt-3">ارسال سریع</h5>
+        <p class="text-muted">ارسال رایگان برای خریدهای بالای 5 میلیون تومان</p>
+    </div>
+    <div class="col-md-3">
+        <i class="bi bi-shield-check display-4 text-primary"></i>
+        <h5 class="mt-3">ضمانت اصالت کالا</h5>
+        <p class="text-muted">تمامی محصولات اصل و با گارانتی معتبر</p>
+    </div>
+    <div class="col-md-3">
+        <i class="bi bi-headset display-4 text-primary"></i>
+        <h5 class="mt-3">پشتیبانی 24/7</h5>
+        <p class="text-muted">پاسخگویی و مشاوره رایگان</p>
+    </div>
+    <div class="col-md-3">
+        <i class="bi bi-arrow-counterclockwise display-4 text-primary"></i>
+        <h5 class="mt-3">ضمانت بازگشت</h5>
+        <p class="text-muted">7 روز ضمانت بازگشت کالا</p>
+    </div>
+</div>

@@ -1,0 +1,155 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin,Manager")]
+@model SecurityStore.Web.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "پنل مدیریت";
+}
+
+<h1><i class="bi bi-speedometer2"></i> داشبورد مدیریت</h1>
+<hr>
+
+<!-- KPIs - شاخص‌های کلیدی -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">محصولات</h5>
+                        <h2>@Model.TotalProducts</h2>
+                    </div>
+                    <i class="bi bi-box display-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">سفارشات</h5>
+                        <h2>@Model.TotalOrders</h2>
+                    </div>
+                    <i class="bi bi-bag display-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">مشتریان</h5>
+                        <h2>@Model.TotalCustomers</h2>
+                    </div>
+                    <i class="bi bi-people display-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">فروش کل</h5>
+                        <h3>@Model.TotalRevenue.ToString("N0")</h3>
+                        <small>تومان</small>
+                    </div>
+                    <i class="bi bi-cash display-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Links - لینک‌های سریع -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-lightning"></i> دسترسی سریع</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a asp-page="/Admin/Products/Index" class="btn btn-outline-primary w-100 py-3">
+                            <i class="bi bi-box display-6"></i><br>
+                            مدیریت محصولات
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a asp-page="/Admin/Orders/Index" class="btn btn-outline-success w-100 py-3">
+                            <i class="bi bi-bag display-6"></i><br>
+                            مدیریت سفارشات
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a asp-page="/Admin/Customers/Index" class="btn btn-outline-info w-100 py-3">
+                            <i class="bi bi-people display-6"></i><br>
+                            مدیریت مشتریان
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a asp-page="/Admin/Settings/Index" class="btn btn-outline-secondary w-100 py-3">
+                            <i class="bi bi-gear display-6"></i><br>
+                            تنظیمات
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Orders - سفارشات اخیر -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-clock-history"></i> سفارشات اخیر</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.RecentOrders.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>شماره سفارش</th>
+                                    <th>مشتری</th>
+                                    <th>مبلغ</th>
+                                    <th>وضعیت</th>
+                                    <th>تاریخ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in Model.RecentOrders)
+                                {
+                                    <tr>
+                                        <td>@order.OrderNumber</td>
+                                        <td>@order.UserId</td>
+                                        <td>@order.TotalAmount.ToString("N0") تومان</td>
+                                        <td>
+                                            <span class="badge bg-@(order.Status.ToString() == "Paid" ? "success" : "warning")">
+                                                @order.Status
+                                            </span>
+                                        </td>
+                                        <td>@order.CreatedAt.ToString("yyyy/MM/dd HH:mm")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">هیچ سفارشی ثبت نشده است.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
