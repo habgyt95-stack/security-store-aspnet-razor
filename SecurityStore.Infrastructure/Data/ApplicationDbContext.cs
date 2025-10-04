@@ -27,6 +27,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<MenuItem> MenuItems => Set<MenuItem>();
     public DbSet<MediaFile> MediaFiles => Set<MediaFile>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<ProductReview> ProductReviews => Set<ProductReview>();
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -93,6 +94,17 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
                 .WithMany(e => e.SubMenuItems)
                 .HasForeignKey(e => e.ParentMenuItemId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+        
+        // ProductReview
+        builder.Entity<ProductReview>(entity =>
+        {
+            entity.HasOne(e => e.Product)
+                .WithMany(e => e.ProductReviews)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasIndex(e => new { e.ProductId, e.UserId });
         });
     }
 }

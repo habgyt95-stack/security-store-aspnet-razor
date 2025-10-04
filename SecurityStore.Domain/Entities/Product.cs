@@ -60,4 +60,7 @@ public class Product : BaseEntity
     
     // آیتم‌های سفارش
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+    
+    // نظرات محصول
+    public ICollection<ProductReview> ProductReviews { get; set; } = new List<ProductReview>();
 }
